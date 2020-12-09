@@ -4,7 +4,7 @@
   "description": "ComparaOnline Software Engineer Test",
   "main": "index.js",
   "scripts": {
-    "after-30-days": "node after-30-days.js",
+    "after-30-days": "node src/after-30-days.js",
     "test": "nyc mocha spec/*.js"
   },
   "repository": {
