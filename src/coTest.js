@@ -8,60 +8,50 @@ class Product {
 
 class CarInsurance {
   constructor(products = []) {
-    this.products = products;
-  }
-  updatePrice() {
-    for (var i = 0; i < this.products.length; i++) {
-      if (this.products[i].name != 'Full Coverage' && this.products[i].name != 'Special Full Coverage') {
-        if (this.products[i].price > 0) {
-          if (this.products[i].name != 'Mega Coverage') {
-            this.products[i].price = this.products[i].price - 1;
-          }
-        }
-      } else {
-        if (this.products[i].price < 50) {
-          this.products[i].price = this.products[i].price + 1;
-          if (this.products[i].name == 'Special Full Coverage') {
-            if (this.products[i].sellIn < 11) {
-              if (this.products[i].price < 50) {
-                this.products[i].price = this.products[i].price + 1;
-              }
-            }
-            if (this.products[i].sellIn < 6) {
-              if (this.products[i].price < 50) {
-                this.products[i].price = this.products[i].price + 1;
-              }
-            }
-          }
-        }
-      }
-      if (this.products[i].name != 'Mega Coverage') {
-        this.products[i].sellIn = this.products[i].sellIn - 1;
-      }
-      if (this.products[i].sellIn < 0) {
-        if (this.products[i].name != 'Full Coverage') {
-          if (this.products[i].name != 'Special Full Coverage') {
-            if (this.products[i].price > 0) {
-              if (this.products[i].name != 'Mega Coverage') {
-                this.products[i].price = this.products[i].price - 1;
-              }
-            }
-          } else {
-            this.products[i].price = this.products[i].price - this.products[i].price;
-          }
-        } else {
-          if (this.products[i].price < 50) {
-            this.products[i].price = this.products[i].price + 1;
-          }
-        }
-      }
-    }
+    // array to match Coverage Types against classes
+    const productTypeClasses = [
+      {"name": "Medium Coverage", "class": "CarInsuranceMediumCoverage"},
+      {"name": "Full Coverage", "class": "CarInsuranceFullCoverage"},
+      {"name": "Low Coverage", "class": "CarInsuranceLowCoverage"},
+      {"name": "Mega Coverage", "class": "CarInsuranceMegaCoverage"},
+      {"name": "Special Full Coverage", "class": "CarInsuranceSpecialFullCoverage"},
+      {"name": "Super Sale", "class": "CarInsuranceSuperSale"}
+    ];
 
+    // create an object's array to call each updatePrice method
+    this.products = [];
+    for (var i in products) {
+      var found = false;
+      for (var j in productTypeClasses) {
+        if (products[i]['name'] === productTypeClasses[j].name) {
+          found = true;
+          let createClassStr = 'new ' + productTypeClasses[j].class + '("' + products[i]['name'] + '",' + products[i]['sellIn'] + ',' + products[i]['price'] + ')';
+          this.products.push(eval(createClassStr));
+        }
+      }
+      if (!found) {
+        this.products.push(new CarInsuranceGenericCoverage(products[i]['name'], products[i]['sellIn'], products[i]['price']));
+      }
+  }
+  }
+  updatePrices() {
+    for (var i = 0; i < this.products.length; i++) {
+      this.products[i].updatePrice();
+    }
     return this.products;
+  }
+  updatePrice(product, decrease = 1) {
+    product.sellIn = product.sellIn - 1;
+    if (product.price > 0 && product.price < 50) {
+      product.price = product.price - decrease;
+      if (product.sellIn < 0) {
+        product.price = product.price - decrease;
+      }
+  }
   }
 }
 
 module.exports = {
   Product,
   CarInsurance
-}
+};
